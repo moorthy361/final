@@ -1,9 +1,3 @@
-# =============================================================================
-# AquaSentinel AI — FastAPI Application Entry Point
-# =============================================================================
-# Run with: uvicorn main:app --reload
-# =============================================================================
-
 from datetime import datetime, timezone
 
 from fastapi import FastAPI
@@ -13,7 +7,22 @@ from config import settings
 from database import create_tables, SessionLocal
 
 # Import all routers
-from routers import auth, dashboard, water_quality, anomalies, risk, warnings, sensor_health, historical, sensors
+from routers import (
+    auth,
+    dashboard,
+    water_quality,
+    anomalies,
+    risk,
+    warnings,
+    sensor_health,
+    historical,
+    sensors,
+)
+
+
+# =============================================================================
+# APPLICATION
+# =============================================================================
 
 app = FastAPI(
     title="AquaSentinel AI",
@@ -21,7 +30,10 @@ app = FastAPI(
     version="1.0.0",
 )
 
-# ─── CORS Middleware ──────────────────────────────────────────────────────────────
+
+# =============================================================================
+# CORS CONFIGURATION
+# =============================================================================
 
 app.add_middleware(
     CORSMiddleware,
@@ -31,21 +43,76 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# ─── Mount Routers ───────────────────────────────────────────────────────────────
 
-app.include_router(auth.router, prefix="/api")
-app.include_router(dashboard.router, prefix="/api")
-app.include_router(water_quality.router, prefix="/api")
-app.include_router(anomalies.router, prefix="/api")
-app.include_router(risk.router, prefix="/api")
-app.include_router(warnings.router, prefix="/api")
-app.include_router(sensor_health.router, prefix="/api")
-app.include_router(historical.router, prefix="/api")
-app.include_router(sensors.router, prefix="/api")
+# =============================================================================
+# API ROUTERS
+# =============================================================================
+
+app.include_router(
+    auth.router,
+    prefix="/api",
+)
+
+app.include_router(
+    dashboard.router,
+    prefix="/api",
+)
+
+app.include_router(
+    water_quality.router,
+    prefix="/api",
+)
+
+app.include_router(
+    anomalies.router,
+    prefix="/api",
+)
+
+app.include_router(
+    risk.router,
+    prefix="/api",
+)
+
+app.include_router(
+    warnings.router,
+    prefix="/api",
+)
+
+app.include_router(
+    sensor_health.router,
+    prefix="/api",
+)
+
+app.include_router(
+    historical.router,
+    prefix="/api",
+)
+
+app.include_router(
+    sensors.router,
+    prefix="/api",
+)
 
 
-# ─── Health Endpoint (at root, not under /api) ──────────────────────────────────
+# =============================================================================
+# ROOT ENDPOINT
+# =============================================================================
 
+@app.get("/")
+def root():
+    return {
+        "service": "AquaSentinel AI",
+        "status": "online",
+        "version": "1.0.0",
+        "message": "AquaSentinel AI backend is running successfully.",
+        "docs": "/docs",
+        "health": "/health",
+    }
+
+
+# =============================================================================
+# HEALTH CHECK
+# =============================================================================
 
 @app.get("/health")
 def health_check():
@@ -62,27 +129,38 @@ def health_check():
     }
 
 
-# ─── Startup Event ───────────────────────────────────────────────────────────────
-
+# =============================================================================
+# STARTUP
+# =============================================================================
 
 @app.on_event("startup")
 def on_startup():
-    # Import models so they are registered with Base
+
+    # Import models so SQLAlchemy registers all models
     import models  # noqa: F401
 
-    # Create tables
+    # Create database tables
     create_tables()
+
     print("[startup] Database tables created.")
 
-    # Auto-seed if enabled
+    # Automatically seed database if enabled
     if settings.AUTO_SEED:
+
         from seed import seed_database
+
         db = SessionLocal()
+
         try:
             seed_database(db)
+            print("[startup] Database seeded successfully.")
+
+        except Exception as error:
+            print(f"[startup] Database seeding failed: {error}")
+
         finally:
             db.close()
 
     print("[startup] AquaSentinel AI backend ready.")
     print(f"[startup] CORS origins: {settings.CORS_ORIGINS}")
-    print(f"[startup] API docs: http://127.0.0.1:8000/docs")
+    print("[startup] API documentation available at /docs")

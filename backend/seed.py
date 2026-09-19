@@ -37,9 +37,9 @@ def seed_database(db: Session) -> None:
 
     admin = User(
         id=str(uuid.uuid4()),
-        email="admin@aquasentinel.ai",
-        name="Admin User",
-        hashed_password=_hash_password("admin123"),
+        email="moorthy.alliedminds@gmail.com",
+        name="Moorthy",
+        hashed_password=_hash_password("Moorthy2025"),
         avatar_url=None,
     )
     db.add(admin)
@@ -223,4 +223,4 @@ def seed_database(db: Session) -> None:
 
     db.commit()
     print(f"[seed] Created: 1 user, {len(readings)} sensor readings, {anomaly_count} anomaly records, {len(warning_templates)} warnings")
-    print(f"[seed] Default login: admin@aquasentinel.ai / admin123")
+    print(f"[seed] Default login: moorthy.alliedminds@gmail.com / Moorthy2025")

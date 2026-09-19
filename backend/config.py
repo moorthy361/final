@@ -17,7 +17,7 @@ class Settings(BaseSettings):
     JWT_ALGORITHM: str = "HS256"
     JWT_EXPIRY_MINUTES: int = 60
 
-    # CORS — allow Vite dev server origins
+    # CORS
     CORS_ORIGINS: list[str] = [
         "http://localhost:5173",
         "http://127.0.0.1:5173",
@@ -25,10 +25,13 @@ class Settings(BaseSettings):
         "http://127.0.0.1:3000",
     ]
 
-    # Auto-seed database on first run
+    # Auto-seed database
     AUTO_SEED: bool = True
 
-    model_config = {"env_file": ".env", "env_file_encoding": "utf-8"}
+    model_config = {
+        "env_file": ".env",
+        "env_file_encoding": "utf-8"
+    }
 
 
 settings = Settings()

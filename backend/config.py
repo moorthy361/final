@@ -23,6 +23,8 @@ class Settings(BaseSettings):
         "http://127.0.0.1:5173",
         "http://localhost:3000",
         "http://127.0.0.1:3000",
+         # Production frontend
+    "https://final-3h14bvz37-moorthy361.vercel.app/",
     ]
 
     # Auto-seed database
